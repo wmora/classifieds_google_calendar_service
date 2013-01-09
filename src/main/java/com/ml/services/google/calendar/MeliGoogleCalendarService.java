@@ -9,14 +9,15 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.google.gdata.client.GoogleAuthTokenFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 
 public class MeliGoogleCalendarService {
@@ -64,9 +65,10 @@ public class MeliGoogleCalendarService {
             System.out.println(
                     "Invalid Client ID and Secret from https://code.google.com/apis/console/?api=calendar");
         }
+
         // set up file credential store
         FileCredentialStore credentialStore = new FileCredentialStore(
-                new File(System.getProperty("user.home"), ".credentials/calendar.json"), JSON_FACTORY);
+                new File("calendar.json"), JSON_FACTORY);
         // set up authorization code flow
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets,
