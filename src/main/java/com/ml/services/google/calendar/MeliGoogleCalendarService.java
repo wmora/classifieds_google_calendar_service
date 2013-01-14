@@ -9,15 +9,12 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.gdata.client.GoogleAuthTokenFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 
 public class MeliGoogleCalendarService {
@@ -66,9 +63,34 @@ public class MeliGoogleCalendarService {
                     "Invalid Client ID and Secret from https://code.google.com/apis/console/?api=calendar");
         }
 
+        System.out.println("Client Id: " + clientSecrets.getDetails().getClientId());
+
         // set up file credential store
+        String filename = "calendar_token.json";
+        File file = new File(filename);
+        file.setExecutable(true, false);
+        file.setReadable(true, false);
+        file.setWritable(true, false);
+        if (!file.exists()) {
+            System.out.println("Creating credentials file");
+            InputStream defaultToken = MeliGoogleCalendarService.class.getResourceAsStream(String.format("/%s", filename));
+            OutputStream out = new FileOutputStream(file);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = defaultToken.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+
+            defaultToken.close();
+            out.flush();
+            out.close();
+        }
+
+        System.out.println(filename + " created in:" + file.getAbsolutePath());
+
         FileCredentialStore credentialStore = new FileCredentialStore(
-                new File("calendar.json"), JSON_FACTORY);
+                file, JSON_FACTORY);
         // set up authorization code flow
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets,

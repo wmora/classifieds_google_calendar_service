@@ -22,30 +22,23 @@ public class MeliGoogleCalendarServiceTest extends TestCase {
     private MeliGoogleCalendarService service;
     private String eventIdOk;
     private String eventIdNotOk;
+    private ArrayList<Event> events = new ArrayList<Event>();
+
 
     public void setUp() throws Exception {
         service = new MeliGoogleCalendarService();
-        calendarIdOk = "mercadolibre.com_tkov79t3uc9dg7c6j941autnvc@group.calendar.google.com";
+        calendarIdOk = "mercadolibre.com_forlfsjld6nnk0je6a1gesg5vk@group.calendar.google.com";
         calendarIdNotOk = "this_calendar_does_not_exist";
-        eventIdOk = createTestEvent();
+        eventIdOk = getTestEventId();
         eventIdNotOk = "this_is_an_invalid_event_id";
     }
 
-    private String createTestEvent() {
+    private String getTestEventId() {
         Event event = new Event();
         List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>();
         EventAttendee attendee1 = new EventAttendee();
         attendee1.setEmail("william.mora@mercadolibre.com.ve");
         eventAttendees.add(attendee1);
-        EventAttendee attendee2 = new EventAttendee();
-        attendee2.setEmail("migcenel.gonzalez@mercadolibre.com.ve");
-        eventAttendees.add(attendee2);
-        EventAttendee attendee3 = new EventAttendee();
-        attendee3.setEmail("franco.martinez@mercadolibre.com.ve");
-        eventAttendees.add(attendee3);
-        EventAttendee attendee4 = new EventAttendee();
-        attendee4.setEmail("facundo.korssjoen@mercadolibre.com");
-        eventAttendees.add(attendee4);
         event.setAttendees(eventAttendees);
         event.setSummary("Evento creado automáticamente");
         event.setDescription("Evento creado automáticamente con APIs de Google");
@@ -55,13 +48,16 @@ public class MeliGoogleCalendarServiceTest extends TestCase {
         event.setStart(new EventDateTime().setDateTime(start));
         DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
         event.setEnd(new EventDateTime().setDateTime(end));
-
         Event result = service.addEvent(calendarIdOk, event);
+        events.add(result);
         return result.getId();
     }
 
     public void tearDown() throws Exception {
-        service.deleteEvent(calendarIdOk, eventIdOk);
+        for(Event e: events) {
+            service.deleteEvent(calendarIdOk, e.getId());
+            System.out.println(String.format("Event %s deleted", e.getId()));
+        }
     }
 
     public void testAddEvent() throws Exception {
@@ -79,7 +75,7 @@ public class MeliGoogleCalendarServiceTest extends TestCase {
         attendee3.setEmail("franco.martinez@mercadolibre.com.ve");
         eventAttendees.add(attendee3);
         EventAttendee attendee4 = new EventAttendee();
-        attendee4.setEmail("facundo.korssjoen@mercadolibre.com");
+        attendee4.setEmail("daniel.loreto@mercadolibre.com.ve");
         eventAttendees.add(attendee4);
         event.setAttendees(eventAttendees);
         event.setSummary(summary);
@@ -91,7 +87,7 @@ public class MeliGoogleCalendarServiceTest extends TestCase {
         DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
         event.setEnd(new EventDateTime().setDateTime(end));
         Event result = service.addEvent(calendarIdOk, event);
-        System.out.println(result.getId());
+        events.add(result);
         assertTrue(result.getDescription().equals(description));
         assertTrue(result.getSummary().equals(summary));
     }
